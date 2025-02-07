@@ -9,7 +9,8 @@
   },
   "keywords": [
     "nodejs",
-    "backend"
+    "backend",
+    "mongodb"
   ],
   "author": "Afriduzzaman",
   "license": "ISC",
