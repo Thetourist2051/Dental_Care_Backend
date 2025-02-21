@@ -1,31 +1,52 @@
-const jwt = require("jsonwebtoken")
-require("dotenv").config()
+require("dotenv").config();
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
 
-const requestLogger = (req, res, next)=>{
+const requestLogger = (req, res, next) => {
     const timestamp = new Date().toISOString();
-    console.log(`[${timestamp}] ${req.method} ${req.url}`);
+    const method = req.method;
+    const url = req.url;
+
+    const startTime = process.hrtime();
+
+    res.on("finish", () => {
+        const [seconds, nanoseconds] = process.hrtime(startTime);
+        const responseTime = (seconds * 1000 + nanoseconds / 1e6).toFixed(2);
+        const statusCode = res.statusCode;
+
+        const logMessage = `----
+[${timestamp}] ${method} ${url}
+Response Status : ${statusCode}
+Response Time   : ${responseTime} ms
+---`;
+
+        console.log(logMessage);
+    });
+
     next();
 }
 
-const userAuth = (req, res, next)=>{
-    console.log("In user Auth")
-    const token = "Afridi"
-    if(token === process.env.JWT_TOKEN){
-        next()
-    }else{
-        res.status(401).json({status : -1, message : "Unauthorized User !!!"})
-    }
-}
-
-const protectedAuth = (req, res, next)=>{
-    console.log('In Protected Auth')
-    const token = "afridi"
-    if(token === process.env.JWT_TOKEN ){
+const userAuth = async (req, res, next) => {
+    try {
+        const { token } = req?.cookies;
+        console.log("token ---->", token);
+        if (!token) {
+            throw new Error("Token Not Found! Kindly Login Again :(");
+        }
+        const decodedInfo = jwt.verify(token, process.env.JWT_SECRET_TOKEN);
+        const { _id } = decodedInfo;
+        const decodedUser = await User.findById(_id);
+        if (!decodedUser) {
+            throw new Error("User not Found !");
+        }
+        req.user = decodedUser;
         next();
-    }else{
-        res.status(401).json({state :-1,message:"Does not have enough permission to this protected Path!"})
+    } catch (err) {
+        res.status(400).json({
+            message: err?.message || "An Unknown Error Occured at userAuth !",
+            state: -1,
+        });
     }
-}
+};
 
-
-module.exports = { requestLogger, protectedAuth }
+module.exports = { requestLogger, userAuth };
