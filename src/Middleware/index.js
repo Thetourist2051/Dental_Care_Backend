@@ -1,6 +1,7 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const chalk = require("chalk")
 
 const requestLogger = (req, res, next) => {
     const timestamp = new Date().toISOString();
@@ -14,17 +15,31 @@ const requestLogger = (req, res, next) => {
         const responseTime = (seconds * 1000 + nanoseconds / 1e6).toFixed(2);
         const statusCode = res.statusCode;
 
-        const logMessage = `----
-[${timestamp}] ${method} ${url}
-Response Status : ${statusCode}
-Response Time   : ${responseTime} ms
----`;
-
-        console.log(logMessage);
+        console.log(chalk.gray("\n---------------------------"));
+        console.log(
+            `${chalk.blue.bold("Timestamp:")} ${chalk.cyan(timestamp)}`
+        );
+        console.log(
+            `${chalk.magenta.bold("Method:")} ${chalk.white.bgMagenta(
+                ` ${method} `
+            )}`
+        );
+        console.log(`${chalk.green.bold("URL:")} ${chalk.yellow(url)}`);
+        console.log(
+            `${chalk.red.bold("Response Status:")} ${chalk.white.bgRed(
+                ` ${statusCode} `
+            )}`
+        );
+        console.log(
+            `${chalk.blue.bold("Response Time:")} ${chalk.white.bgBlue(
+                ` ${responseTime} ms `
+            )}`
+        );
+        console.log(chalk.gray("---------------------------\n"));
     });
 
     next();
-}
+};
 
 const userAuth = async (req, res, next) => {
     try {
