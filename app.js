@@ -7,7 +7,6 @@ const User = require("./src/models/user.js");
 const cookieParser = require("cookie-parser");
 const port = process.env.PORT;
 const app = express();
-const { routes } = require("./src/routes");
 
 app.use(express.json());
 app.use(cookieParser());
