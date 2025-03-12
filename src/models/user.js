@@ -2,33 +2,20 @@ const { default: mongoose } = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
-    firstname: {
+    fullname: {
       type: String,
       required: true,
       minlength: 2,
-      maxlength: 20,
+      maxlength: 100,
       trim: true,
-    },
-    lastname: {
-      type: String,
-      required: false,
-      minlength: 2,
-      maxlength: 20,
-      trim: true,
-    },
-    dob: {
-      type: Date,
-      required: false,
-      validate: {
-        validator: validateDOB,
-        message: "Invalid Date of Birth",
-      },
     },
     email: {
       type: String,
       required: false,
       unique: true,
       lowercase: true,
+      minlength: 5,
+      maxlength: 75,
       validate: {
         validator: validateEmail,
         message: "Invalid Email",
@@ -39,10 +26,22 @@ const userSchema = new mongoose.Schema(
       required: true,
       minlength: 6,
     },
+    age: {
+      type: Number,
+      required: true,
+      maximum:100,
+    },
     gender: {
       type: String,
       enum: ["Male", "Female", "Other"],
       required: true,
+    },
+    address: {
+      type: String,
+      required: true,
+      minlength: 5,
+      maxlength: 250,
+      trim: true,
     },
   },
   {
@@ -61,6 +60,6 @@ function validateEmail(email) {
 
 function validateDOB(dob) {
   const minDOB = new Date();
-  minDOB.setFullYear(minDOB.getFullYear() - 10);
+  minDOB.setFullYear(minDOB.getFullYear() - 0);
   return dob <= minDOB;
 }
