@@ -1,8 +1,8 @@
 const express = require("express");
 const profileRouter = express.Router();
-const { userAuth } = require("../middleware/index.js");
+const { userAuth } = require("../../middleware/index.js");
 
-profileRouter.get("/profile", userAuth, async (req, res) => {
+profileRouter.get("/fetch-profile", userAuth, async (req, res) => {
   try {
     res.status(200).json({
       data: req?.user,

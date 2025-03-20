@@ -1,6 +1,6 @@
 const express = require("express");
 const authRouter = express.Router();
-const User = require("../models/user.js");
+const User = require("../../models/user.js");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
 const jwt = require("jsonwebtoken");
@@ -61,38 +61,26 @@ authRouter.post("/login", async (req, res) => {
       });
     }
 
-    const accessToken = jwt.sign(
+    const token = jwt.sign(
       { _id: user._id },
       process.env.JWT_SECRET_TOKEN,
       { expiresIn: process.env.JWT_SECRET_EXPIRY }
     );
-
-    const refreshToken = jwt.sign(
-      { _id: user._id },
-      process.env.JWT_REFRESH_SECRET_TOKEN,
-      { expiresIn: process.env.JWT_REFRESH_SECRET_EXPIRY } // e.g., '7d' for 7 days
-    );
-
-    res.cookie("accessToken", accessToken, {
+    
+    res.cookie("token", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-      maxAge: 15 * 60 * 1000,
+      secure: process.env.NODE_ENV === "production", 
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
     });
+    
 
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+
 
     res.status(200).json({
       message: `Welcome back, ${user.fullname}! :)`,
       state: 1,
-      accessToken,
-      refreshToken,
       userInfo: user,
+      token: token,
     });
   } catch (err) {
     console.error("Login error:", err);
@@ -104,13 +92,23 @@ authRouter.post("/login", async (req, res) => {
   }
 });
 
+authRouter.post("/logout", async(req, res)=>{
+  res.cookie("token",null,{
+    expires: new Date(Date.now())
+  })
+  res.status(200).json({
+    state : 1,
+    message: "You've successfully Logged-out !"
+  })
+})
+
 authRouter.post("/validate-token", async (req, res) => {
   try {
-    const { authToken } = req.body;
-    if (!authToken) {
+    const { token } = req.body;
+    if (!token) {
       throw new Error("Token Not Found! Kindly Login Again :(");
     }
-    const decodedInfo = jwt.verify(authToken, process.env.JWT_SECRET_TOKEN);
+    const decodedInfo = jwt.verify(token, process.env.JWT_SECRET_TOKEN);
     const { _id } = decodedInfo;
     const decodedUser = await User.findById(_id);
     if (!decodedUser) {
