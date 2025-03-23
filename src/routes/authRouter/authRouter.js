@@ -8,24 +8,26 @@ const jwt = require("jsonwebtoken");
 authRouter.post("/signup", async (req, res) => {
   try {
     console.log(req.body);
-    const { fullname, email, address, age, password, gender } = req.body;
+    const { fullname, email, address, password, gender, mobileno } = req.body;
     const passwordHash = await bcrypt.hash(password, 10);
 
     const user = new User({
       fullname,
       email,
+      mobileno,
       address,
-      age,
       password: passwordHash,
       gender,
     });
     await user.save();
 
+    const fname = fullname?.split(' ')[0]
     res.json({
-      message: "You have successfully Signed up .",
+      message: `Hey ${fname}, you have successfully Signed-up .`,
       state: 1,
     });
   } catch (err) {
+    console.log(err)
     res.status(400).json({
       message: "An Unknown Error Occured While Sign-up !",
       error: err?.message,

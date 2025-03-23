@@ -26,19 +26,63 @@ const userSchema = new mongoose.Schema(
       required: true,
       minlength: 6,
     },
+    mobileno: {
+      type: String,
+      required: true,
+      validate: {
+        validator: function (v) {
+          return /^[0-9]{10}$/.test(v);
+        },
+        message: "Mobile number must be exactly 10 digits.",
+      },
+    },
+    emergencyContact: {
+      type: String,
+      required: false,
+      maxlength: 100,
+      trim: true,
+    },
     age: {
       type: Number,
-      required: true,
-      maximum:100,
+      required: false,
+      max: 100,
     },
     gender: {
       type: String,
       enum: ["Male", "Female", "Other"],
-      required: true,
+      required: false,
+    },
+    bloodgroup: {
+      type: String,
+      enum: ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-", "Unknown"],
+      required: false,
+      default: "Unknown",
+    },
+    medicalHistory: {
+      type: String,
+      required: false,
+      maxlength :200,
+    },
+    currentMedications: {
+      type: String,
+      required: false,
+      maxlength :200,
+    },
+    bloodPressure: {
+      type: String,
+      required: false,
+      maxlength: 100,
+      trim: true,
+    },
+    alcoholConsumption: {
+      type: String, 
+      enum: ["Yes", "No"],
+      required: false,
+      default: null,
     },
     address: {
       type: String,
-      required: true,
+      required: false,
       minlength: 5,
       maxlength: 250,
       trim: true,
