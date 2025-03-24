@@ -1,4 +1,6 @@
 const { default: mongoose } = require("mongoose");
+const dotenv = require("dotenv");
+dotenv?.config();
 
 const userSchema = new mongoose.Schema(
   {
@@ -83,17 +85,22 @@ const userSchema = new mongoose.Schema(
     address: {
       type: String,
       required: false,
-      minlength: 5,
       maxlength: 250,
       trim: true,
     },
+    role:{
+      type: String,
+      enum: ["admin" ,"user"],
+      default: "user",
+      required: false,
+    }
   },
   {
     timestamps: true,
   }
 );
 
-const userModel = mongoose.model("Users", userSchema);
+const userModel = mongoose.model(process.env.COLLECTION_NAME, userSchema);
 
 module.exports = userModel;
 

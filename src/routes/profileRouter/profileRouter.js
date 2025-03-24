@@ -11,15 +11,15 @@ profileRouter.get("/fetch-profile", userAuth, async (req, res) => {
       state: 1,
     });
   } catch (err) {
-    res.status(500).json({
-      error: `An Unknown Error Occured in Profile API !`,
+    res.status(209).json({
+      error: `An Unknown Error Occured in Fetching Profile !`,
       message: err?.message,
-      state: -1,
+      state: 0,
     });
   }
 });
 
-profileRouter.patch("/update-profile", userAuth, async (req, res) => {
+profileRouter.put("/update-profile", userAuth, async (req, res) => {
   try {
     const { _id } = req?.user;
     const requesteduser = req?.body;

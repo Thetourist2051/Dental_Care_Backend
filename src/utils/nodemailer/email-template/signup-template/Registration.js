@@ -1,4 +1,7 @@
-const registrationTemplate = " "
+const template = {
+    signupTemplate: '',
+
+}
 
 
-module.exports = registrationTemplate
+module.exports = template
